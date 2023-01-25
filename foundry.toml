@@ -2,5 +2,9 @@
 src = 'src'
 out = 'out'
 libs = ['lib']
+#libraries = ["src/core/Gen.sol:Gen:0x4098069Bc1229C36710E86730d615F2d072c9AC7", "src/core/HTMLBoilerplate.sol:HTMLBoilerplate:0xC5b0607b51f56f47fC5520dE488ddD22d008adF5"]
+
+#libraries =["src/core/Gen.sol:Gen:0x4098069Bc1229C36710E86730d615F2d072c9AC7",
+#"src/core/HTMLBoilerplate.sol:HTMLBoilerplate:0xC5b0607b51f56f47fC5520dE488ddD22d008adF5", "src/core/Vectors.sol:Vectors:0xC5b0607b51f56f47fC5520dE488ddD22d008adF5","src/lib/ListUtils.sol:ListUtils:0xC940130a2a74083Cfc8CbA52276206D857fAAC10", "src/generative/Puzzle.sol:Puzzle:0xa55ee66c318482382aD4c5486891b1F7049973ef", "src/sdf/SDF.sol:SDF:0x7B37ff259cc5245ea4b8827193dFad0d5af5d846", "src/sdf/Scenes.sol:Scenes:0x1387620D83d208115D0F488F6A620De1A11786D0", "src/sdf/Layers.sol:Layers:0xB7018383383Bf4D2124Cf745C7940E5d5009de3C","src/sdf/Layout.sol:Layout:0x315C5f455b45e4885766E61398b202Ca6c437E04", "src/GenerativeArt.sol:GenerativeArt:0xC8c93E83403e1ee750690812cBA85638aa06E87E"]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-import "./GenFunction.sol";
-import "./Primitive.sol";
-import "./Conversion.sol";
+pragma solidity ^0.8.13;
+import "../core/Gen.sol";
+import "../lib/Conversion.sol";
 
 library SDF {
-    
     function circle(
         string memory position, 
         string memory radius) public pure returns (string memory) {    
@@ -25,48 +23,47 @@ library SDF {
             )
         );
     }
-
+    
     function rect(
         string memory position, 
         string memory dimensions, 
-        string memory corner) public pure returns (string memory) {    
+        string memory corner,
+        string memory rotation) public pure returns (string memory) {    
         return string(
             abi.encodePacked(
-                "sdfRect(uv - ", position, ", ", dimensions, ", ", corner, ")"      
+                "sdfRect(uv - ", position, ", ", dimensions, ", ", corner, ", ", rotation, ")"      
             )
         );
     }
     
-    function genFunctions() public pure returns (string memory) {
-        return _sdfRect();
-    }
-
     function union(string memory a, string memory b) public pure returns (string memory) {
-        return Primitive.gen("min", a, b);
+        return Gen.primitive("min", a, b);
     }
 
     function subtraction(string memory a, string memory b) public pure returns (string memory) {
-        return Primitive.gen("max", string(abi.encodePacked("-", a)), b);
+        return Gen.primitive("max", string(abi.encodePacked("-", a)), b);
     }
 
     function intersection(string memory a, string memory b) public pure returns (string memory) {
-        return Primitive.gen("max", a, b);
+        return Gen.primitive("max", a, b);
     }
 
     
     function _sdfRect() private pure returns (string memory) {
-        return GenFunction.gen(
-            GenFunction.Function(
+        return Gen.gen(
+            Gen.Function(
                 "sdfRect",
                 "float",
-                "vec2 p, vec2 b, vec4 r",
+                "vec2 p, vec2 b, vec4 r, float angle",
 
                 // body
                 "r.xy = (p.x>0.0)?r.xy : r.zw;\\n"
                 "r.x  = (p.y>0.0)?r.x  : r.y;\\n"
+                "p *= rotate2D(angle);\\n"
                 "vec2 q = abs(p)-b+r.x;\\n"
                 "return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;\\n"
             )
         );
     }
 }
+

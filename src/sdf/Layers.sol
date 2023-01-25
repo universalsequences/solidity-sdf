@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-import "./Gen.sol";
+pragma solidity ^0.8.13;
+import "../core/Gen.sol";
 import "./SDF.sol";
 
 library Layers {
+    using Gen for string;
 
     struct Layer {
         string sdf;
@@ -44,8 +45,8 @@ library Layers {
         return layer;
     }
 
-    function withBlur(Layer memory layer, string memory color) public pure returns  (Layer memory) {
-        layer.color = color;
+    function withBlur(Layer memory layer, string memory blur) public pure returns  (Layer memory) {
+        layer.blur = blur;
         return layer;
     }
 
@@ -77,7 +78,7 @@ library Layers {
             layer.color,
                 Gen.smoothstep(
                 layer.blur,
-                "0.0",
+                "0.0", //layer.blur.mult(layer.sdf),
                 layer.sdf)
         );
     }

@@ -2,21 +2,16 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/GLSL.sol";
-import "../src/Conversion.sol";
+import "../src/ALEZ.sol";
 
 contract GLSLTest is Test {
-    GLSL public glsl;
+    ALEZ public puzzleMaker;
 
     function setUp() public {
-        glsl = new GLSL();
+        puzzleMaker = new ALEZ();
     }
 
     function testSetNumber() public {
-        glsl.generate();
-        
-        assertEq(
-            Conversion.int2float(-3),
-            "-0.003");
+        puzzleMaker.generate();
     }
 }

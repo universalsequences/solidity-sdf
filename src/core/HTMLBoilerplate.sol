@@ -1,20 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-import './Base64.sol';
+pragma solidity ^0.8.13;
+import '../lib/Base64.sol';
 
 library HTMLBoilerplate {
     
-    function boilerPlate(
-        string memory vertexShader,
-        string memory fragmentShader) public pure returns (string memory) {
-
-        string memory x = string(
-          abi.encodePacked(
-            // initShader program loads the shader code (doesnt compile)
-            "function initShaderProgram(gl) {\n"
-            "const vsSource = \"", vertexShader, "\";\n"
-            "const fsSource = \"", fragmentShader, "\";\n"
-            "const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);\n"
+    string constant BOILER_PLATE_A =  "const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);\n"
             "const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);"
             "const shaderProgram = gl.createProgram();\n"
             "gl.attachShader(shaderProgram, vertexShader);\n"
@@ -58,9 +48,7 @@ library HTMLBoilerplate {
             "function drawScene(gl, programInfo, buffers) {\n"
             "  gl.clearColor(0.0, 0.0, 0.0, 1.0);\n"
                 "  gl.clearDepth(1.0);\n"
-                "  gl.enable(gl.DEPTH_TEST);\n"
-                "  gl.depthFunc(gl.LEQUAL)\n"
-                "  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);\n"
+           
 
             // set the attribute
                 "{\n"
@@ -87,56 +75,94 @@ library HTMLBoilerplate {
                 "  gl.useProgram(programInfo.program);\n"
             
             "gl.uniform2fv(programInfo.uniformLocations.res, [window.innerWidth, window.innerHeight]);\n"
-                "  {\n"
-                "    const offset = 0;\n"
-                    "    const vertexCount = 4;\n"
+            
+            "{\n"
+            "   const offset = 0;\n"
+                "    const vertexCount = 4;\n"
                     "    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);\n"
-                    "  }\n"
+            "}\n"
+            "requestAnimationFrame(render);"
             "}\n\n"
+            "const START_TIME = new Date().getTime();\n"
+            "var gl, programInfo, buffers, canvas;\n"
+
 
             "function main() {\n"
-            "  const canvas = document.querySelector(\"#glCanvas\");\n"
+            "  const fO = document.querySelector(\"foreignObject\");\n"
+            "  canvas = fO.querySelector(\"#glCanvas\");\n"
             "  canvas.width = window.innerWidth;\n"
             "  canvas.height = window.innerHeight;\n"
-            "  const gl = canvas.getContext(\"webgl\");\n"
+            "  gl = canvas.getContext(\"webgl\");\n"
             "  const shaderProgram = initShaderProgram(gl);"
 
-            "  const programInfo = {\n"
+            "  programInfo = {\n"
             "    program: shaderProgram,"
             "    attribLocations: {"
             "      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),"
             "    },"
             "    uniformLocations: {\n"
             "      res: gl.getUniformLocation(shaderProgram, 'res'),\n"
+            "      time: gl.getUniformLocation(shaderProgram, 'time'),\n"
             "    },"
             "  };"
-            "  const buffers = initBuffers(gl);"
+            "  buffers = initBuffers(gl);"
             "  drawScene(gl, programInfo, buffers);\n"
+            "  window.addEventListener(\"resize\", render);\n"
             "}"
-            "window.onload = main;"
-                           ));
+
+            "function render() {"
+            "  let time = new Date().getTime() - START_TIME;"
+            "  console.log(time);"
+            "  canvas.width = window.innerWidth;\n"
+            "  canvas.height = window.innerHeight;\n"
+            "  gl.uniform1f(programInfo.uniformLocations.time, time/1000);\n"
+            "gl.uniform2fv(programInfo.uniformLocations.res, [window.innerWidth, window.innerHeight]);\n"
+
+            "  {\n"
+            "   const offset = 0;\n"
+            "   const vertexCount = 4;\n"
+            "   gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);\n"
+            "}\n"
+            "}"
+            "window.onload = main;";
+
+    function boilerPlate(
+        string memory vertexShader,
+        string memory fragmentShader) public pure returns (string memory) {
+
+        string memory x = string(
+          abi.encodePacked(
+            // initShader program loads the shader code (doesnt compile)
+            "function initShaderProgram(gl) {\n"
+            "const vsSource = \"", vertexShader, "\";\n"
+            "const fsSource = \"", fragmentShader, "\";\n",
+            BOILER_PLATE_A
+            )
+        );
         return x;
     }
 
     function withShaders(
         string memory vertexShader,
-        string memory fragmentShader) public returns (string memory) {
+        string memory fragmentShader) public pure returns (string memory) {
         string memory x = string(
             abi.encodePacked(
-              "data:text/html;base64,",
+              "data:image/svg+xml;base64,",
               Base64.encode(
                 bytes(
                   abi.encodePacked(
-                    "<html>\n",              
-                    "<head>"
-                    "<script>\n",
+                    "<svg id=\"container\" xmlns=\"http://www.w3.org/2000/svg\">\n",              
+                    "<foreignObject x=\"0\" y=\"0\" width=\"100%\" height=\"100%\">"
+                    "<span xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+                    "<canvas id=\"glCanvas\"/>\n"
+                    "</span>"
+                    "</foreignObject>"
+                     "<script type=\"text/javascript\">\n",
+                    "//<![CDATA[\n",
                     boilerPlate(vertexShader, fragmentShader),
+                    "\n//]]>\n"
                     "</script>\n"
-                    "</head>\n"
-                    "<body style=\"margin:0px\">\n"
-                    "<canvas id=\"glCanvas\"/>;\n"
-                    "</body>\n"
-                    "</html>\n"
+                    "</svg>\n"
                                    )))));
         return x;
     }
